@@ -27,7 +27,17 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y yamllint
           yamllint .
+- name: Generate Report
+    run: |
+      echo "Validation Summary" > summary.txt
+      echo "Tests executed successfully" >> summary.txt
 
+  
+  - name: Upload Report
+    uses: actions/upload-artifact@v3
+    with:
+      name: validation-report
+      path: summary.txt
       - name: Generate Report
         run: |
           echo "Continuous Validation Report"
