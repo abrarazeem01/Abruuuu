@@ -10,9 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout code
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      # 2. Validate README exists
       - name: Validate README file exists
         run: |
           if [ -f README.md ]; then
@@ -22,23 +24,23 @@ jobs:
             exit 1
           fi
 
+      # 3. Validate YAML syntax
       - name: Validate YAML syntax
         run: |
           sudo apt-get update
           sudo apt-get install -y yamllint
           yamllint .
-- name: Generate Report
-    run: |
-      echo "Validation Summary" > summary.txt
-      echo "Tests executed successfully" >> summary.txt
 
-  
-  - name: Upload Report
-    uses: actions/upload-artifact@v3
-    with:
-      name: validation-report
-      path: summary.txt
+      # 4. Generate Report ✅ (FIXED POSITION)
       - name: Generate Report
         run: |
-          echo "Continuous Validation Report"
-          echo "All validation steps executed"
+          echo "===== VALIDATION REPORT =====" > summary.txt
+          echo "README check + YAML validation completed" >> summary.txt
+          echo "Status: SUCCESS" >> summary.txt
+
+      # 5. Upload Report ✅ (FIXED INDENTATION)
+      - name: Upload Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: validation-report
+          path: summary.txt
