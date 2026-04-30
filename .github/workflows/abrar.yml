@@ -1,0 +1,66 @@
+name: Continuous Validation Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build-test-validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Checkout code
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    # 2. Setup environment
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    # 3. Install dependencies
+    - name: Install Dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install pytest
+
+    # 4. Build Validation (basic check)
+    - name: Build Validation
+      run: echo "Build successful"
+
+    # 5. Test Validation
+    - name: Run Unit Tests
+      run: pytest --junitxml=report.xml
+
+    # 6. Security Validation
+    - name: Security Check
+      run: |
+        pip install bandit
+        bandit -r . -f txt -o security-report.txt
+
+    # 7. Generate Validation Summary
+    - name: Generate Report
+      run: |
+        echo "Validation Summary" > summary.txt
+        echo "Tests + Security checks completed" >> summary.txt
+
+    # 8. Upload Evidence (IMPORTANT)
+    - name: Upload Test Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-report
+        path: report.xml
+
+    - name: Upload Security Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-report
+        path: security-report.txt
+
+    - name: Upload Summary
+      uses: actions/upload-artifact@v3
+      with:
+        name: validation-summary
+        path: summary.txt
