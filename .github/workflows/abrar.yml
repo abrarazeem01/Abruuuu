@@ -2,7 +2,8 @@ name: Continuous Validation Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   build-test-validate:
@@ -12,20 +13,22 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # ✅ Validation Step 1
-      - name: Check Python Syntax
+      - name: Validate README file exists
         run: |
-          echo "Checking syntax..."
-          python -m py_compile $(git ls-files '*.py') || echo "No Python files"
+          if [ -f README.md ]; then
+            echo "README exists"
+          else
+            echo "README missing"
+            exit 1
+          fi
 
-      # ✅ Validation Step 2
-      - name: Run Basic Test
+      - name: Validate YAML syntax
         run: |
-          echo "Running test..."
-          echo "Test Passed"
+          sudo apt-get update
+          sudo apt-get install -y yamllint
+          yamllint .
 
-      # ✅ Report Generation
       - name: Generate Report
         run: |
-          echo "CI Pipeline Report"
-          echo "All validations completed successfully"
+          echo "Continuous Validation Report"
+          echo "All validation steps executed"
